@@ -14,6 +14,70 @@ class Rooms extends StatefulWidget {
 }
 
 class _RoomsState extends State<Rooms> {
+  late Box<dynamic> s = load();
+  @override
+  void initState() {
+    super.initState();
+    load();
+  }
+
+  load() async {
+    s = await Hive.openBox("rooms");
+    return s;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                    SnackBar(content: Text("Removing Data on rooms")));
+                s.clear();
+              },
+              icon: Icon(Icons.clear))
+        ],
+        title: const Text("Rooms Details"),
+      ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () => show(),
+        child: const Icon(Icons.add),
+      ),
+      // body: [0,1,2,2].forEach((element) {
+      //   return Text('')
+      // }),
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            Container(
+              height: MediaQuery.of(context).size.height,
+              child: ListView.builder(
+                  itemCount: s.length,
+                  itemBuilder: (context, i) {
+                    return ListTile(
+                      leading: s.values
+                              .toList()[i]["roomname"]
+                              .toString()
+                              .contains("Roo")
+                          ? const CircleAvatar(child: Text("R"))
+                          : const CircleAvatar(child: Text("L")),
+                      title: Text(
+                        s.values.toList()[i]["roomname"],
+                      ),
+                      subtitle:
+                          Text((s.values.toList()[i]["roomnumber"]).toString()),
+                    );
+                    // return Text(s.values.toList()[i]["roomname"]);
+                  }),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   show() {
     return WidgetsBinding.instance.addPostFrameCallback((_) {
       showDialog(
@@ -54,9 +118,9 @@ class _RoomsState extends State<Rooms> {
                         const SizedBox(
                           height: 20,
                         ),
-                        Text("The type of the room"),
+                        const Text("The type of the room"),
                         ListTile(
-                          title: Text("Classroom"),
+                          title: const Text("Classroom"),
                           leading: Radio(
                             value: "classroom",
                             groupValue: type,
@@ -68,7 +132,7 @@ class _RoomsState extends State<Rooms> {
                           ),
                         ),
                         ListTile(
-                          title: Text("Lab"),
+                          title: const Text("Lab"),
                           leading: Radio(
                             value: "lab",
                             groupValue: type,
@@ -87,7 +151,7 @@ class _RoomsState extends State<Rooms> {
                           ],
                         ),
                         CupertinoButton(
-                            child: Text("Validiate"),
+                            child: const Text("Validiate"),
                             onPressed: () async {
                               // final rooms = await Hive.openBox("rooms");
 
@@ -98,14 +162,16 @@ class _RoomsState extends State<Rooms> {
                                   type.isNotEmpty) {
                                 log("valid");
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Valid! ")));
+                                    const SnackBar(
+                                        content: const Text("Valid! ")));
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Not Valid! ")));
+                                    const SnackBar(
+                                        content: const Text("Not Valid! ")));
                               }
                             }),
                         CupertinoButton(
-                            child: Text("Add"),
+                            child: const Text("Add"),
                             onPressed: () async {
                               setState((() => log("reload")));
                               if (roomnumber.text.isNotEmpty &&
@@ -124,8 +190,8 @@ class _RoomsState extends State<Rooms> {
                                     element["roomname"] ==
                                     results["roomname"])) {
                                   ScaffoldMessenger.of(context).showSnackBar(
-                                      SnackBar(
-                                          content: Text(
+                                      const SnackBar(
+                                          content: const Text(
                                               "Data is Present in the Database")));
                                 } else {
                                   rooms.add(results);
@@ -134,7 +200,8 @@ class _RoomsState extends State<Rooms> {
                                 Navigator.pop(context);
                               } else {
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                    SnackBar(content: Text("Not Valid! ")));
+                                    const SnackBar(
+                                        content: const Text("Not Valid! ")));
                               }
                             })
                       ],
@@ -145,17 +212,5 @@ class _RoomsState extends State<Rooms> {
             );
           });
     });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      floatingActionButton: show(),
-      body: Column(
-        children: [
-          
-        ],
-      ),
-    );
   }
 }
