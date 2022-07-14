@@ -6,4 +6,8 @@ class Teacher {
   int? level;
 
   Teacher({this.level, this.name, this.subjects});
+
+  Map toMap(level, subjects, name) {
+    return {"level": level, "subjects": subjects, "name": name};
+  }
 }

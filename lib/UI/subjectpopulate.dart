@@ -190,8 +190,8 @@ class _RoomsState extends State<Subjects> {
                         //         log("valid");
                         //         ScaffoldMessenger.of(context).showSnackBar(
                         //             const SnackBar(
-                        //                 content: const Text("Valid! ")));
-                        //       } else {
+                        //                 content: cons
+                        
                         //         ScaffoldMessenger.of(context).showSnackBar(
                         //             const SnackBar(
                         //                 content: const Text("Not Valid! ")));
@@ -205,19 +205,20 @@ class _RoomsState extends State<Subjects> {
                                   !int.parse(subjectclass.text).isNaN &&
                                   subjectname.text.isNotEmpty &&
                                   type.isNotEmpty) {
-                                Map results = Subject().toMap(
-                                    subjectname.text,
-                                    int.parse(subjectclass.text),
-                                    int.parse(strength.text),
-                                    type == "classroom"
-                                        ? RoomType(true)
-                                        : RoomType(false));
+                                Map results = Subject(
+                                  type == "classroom"
+                                      ? RoomType(true)
+                                      : RoomType(false),
+                                  int.parse(strength.text),
+                                  int.parse(subjectclass.text),
+                                  subjectname.text,
+                                ).toMap();
 
                                 log(results.toString());
                                 final subjects = await Hive.openBox("subjects");
                                 if (subjects.values.any((element) =>
-                                    element["roomname"] ==
-                                    results["roomname"])) {
+                                    element["subjectname"] ==
+                                    results["subjectname"])) {
                                   ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
                                           content: const Text(
