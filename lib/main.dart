@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 // import 'hive';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:timetableoptimizer/UI/populaterooms.dart';
+import 'package:timetableoptimizer/UI/subjectpopulate.dart';
 import 'package:timetableoptimizer/models/room_type.dart';
 
 void main() async {
@@ -16,6 +17,6 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(home: Rooms());
+    return MaterialApp(home: Subjects());
   }
 }
