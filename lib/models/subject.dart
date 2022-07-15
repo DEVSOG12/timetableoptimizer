@@ -1,12 +1,17 @@
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 import 'package:timetableoptimizer/models/room_type.dart';
 
+part 'subject.g.dart';
+@HiveType(typeId: 1)
 class Subject {
+  @HiveField(0)
   String? subjectname;
+  @HiveField(1)
 
   int? subjectclass;
-
+  @HiveField(2)
   RoomType? preferredclass;
+  @HiveField(3)
 
   int? strength;
   Subject(
@@ -28,20 +33,24 @@ class Subject {
   }
 }
 
-class SubjectAdapter extends TypeAdapter<Subject> {
-  @override
-  final typeId = 1;
+// class SubjectAdapter extends TypeAdapter<Subject> {
+//   @override
+//   final typeId = 1;
 
-  @override
-  Subject read(BinaryReader reader) {
-    return Subject(reader.read(), reader.read(), reader.read(), reader.read());
-  }
+//   @override
+//   Subject read(BinaryReader reader) {
+//     return Subject(
+//         RoomType(false), reader.read(), reader.read(), reader.read());
+//   }
 
-  @override
-  void write(BinaryWriter writer, Subject obj) {
-    writer.write(obj.subjectname);
-    writer.write(obj.subjectclass);
-    writer.write(obj.strength);
-    writer.write(obj.preferredclass);
-  }
-}
+//   @override
+//   void write(BinaryWriter writer, Subject obj) {
+//     writer.write(obj.subjectname);
+//     writer.write(obj.subjectclass);
+//     writer.write(obj.strength);
+//     writer.write(
+//       obj.preferredclass,
+//     );
+//     // writer.
+//   }
+// }

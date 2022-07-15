@@ -10,7 +10,10 @@ import 'package:timetableoptimizer/models/subject.dart';
 void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(RoomTypeAdapter());
-  Hive.registerAdapter(SubjectAdapter());
+  Hive.registerAdapter(
+    SubjectAdapter(),
+  );
+  // Hive.re
 
   runApp(const MyApp());
 }

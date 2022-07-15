@@ -14,11 +14,10 @@ class Rooms extends StatefulWidget {
 }
 
 class _RoomsState extends State<Rooms> {
-  late Box<dynamic> s;
+  late Box<dynamic> s = load();
   @override
   void initState() {
     super.initState();
-    load();
   }
 
   load() async {

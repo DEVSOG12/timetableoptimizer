@@ -15,32 +15,33 @@ class Subjects extends StatefulWidget {
 }
 
 class _RoomsState extends State<Subjects> {
-  late Box<dynamic> s;
-  late Box<dynamic> m;
   @override
   void initState() {
     super.initState();
-    load();
-  }
-
-  load() async {
-    s = await Hive.openBox("subjects");
-    m = await Hive.openBox("rooms");
-    return s;
   }
 
   @override
   Widget build(BuildContext context) {
+    Future<void> _pullRefresh() async {
+      // List<WordPair> freshWords = await WordDataSource().getFutureWords(delay: 2);
+      setState(() {
+        // words = freshWords;
+      });
+      // why use freshWords var? https://stackoverflow.com/a/52992836/2301224
+    }
+
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
+                Box<dynamic> s = await Hive.openBox("subjects");
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Removing Data on subjects")));
                 s.clear();
               },
-              icon: Icon(Icons.clear))
+              icon: Icon(Icons.clear)),
+          IconButton(onPressed: _pullRefresh, icon: Icon(Icons.refresh))
         ],
         title: const Text("Subjects Details"),
       ),
@@ -51,38 +52,56 @@ class _RoomsState extends State<Subjects> {
       // body: [0,1,2,2].forEach((element) {
       //   return Text('')
       // }),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              height: MediaQuery.of(context).size.height,
-              child: ListView.builder(
-                  itemCount: s.length,
-                  itemBuilder: (context, i) {
-                    return ListTile(
-                      leading: s.values
-                              .toList()[i]["subjects"]
-                              .toString()
-                              .contains("Roo")
-                          ? const CircleAvatar(child: Text("R"))
-                          : const CircleAvatar(child: Text("L")),
-                      title: Text(
-                        s.values.toList()[i]["subjectname"],
-                      ),
-                      subtitle: Text(
-                          (s.values.toList()[i]["subjectclass"]).toString()),
-                    );
-                    // return Text(s.values.toList()[i]["roomname"]);
-                  }),
-            )
-          ],
+      body: RefreshIndicator(
+        onRefresh: _pullRefresh,
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Container(
+                height: MediaQuery.of(context).size.height,
+                child: FutureBuilder(
+                    future: Hive.openBox("subjects"),
+                    builder: (context, AsyncSnapshot<Box<dynamic>> sa) {
+                      if (sa.connectionState == ConnectionState.done) {
+                        final Box<dynamic> s = sa.data!;
+                        s.values.toList().sort(((a, b) =>
+                            (a["subjectclass"] as int)
+                                .compareTo(b["subjectclass"])));
+                        // log(s.data as );
+                        return ListView.builder(
+                            itemCount: s.length,
+                            itemBuilder: (context, i) {
+                              return ListTile(
+                                leading: CircleAvatar(
+                                    child: Text(s.values
+                                        .toList()[i]["subjectname"]
+                                        .toString()[0])),
+                                title: Text(
+                                  s.values.toList()[i]["subjectname"],
+                                ),
+                                subtitle: Text((s.values.toList()[i]
+                                        ["subjectclass"])
+                                    .toString()),
+                              );
+                              // return Text(s.values.toList()[i]["roomname"]);
+                            });
+                      }
+                      return Container(
+                        width: 0.0,
+                        height: 0.0,
+                      );
+                    }),
+              )
+            ],
+          ),
         ),
       ),
     );
   }
 
   show() {
-    return WidgetsBinding.instance.addPostFrameCallback((_) {
+    return WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Box<dynamic> m = await Hive.openBox("rooms");
       showDialog(
           context: context,
           builder: (_) {
@@ -191,7 +210,7 @@ class _RoomsState extends State<Subjects> {
                         //         ScaffoldMessenger.of(context).showSnackBar(
                         //             const SnackBar(
                         //                 content: cons
-                        
+
                         //         ScaffoldMessenger.of(context).showSnackBar(
                         //             const SnackBar(
                         //                 content: const Text("Not Valid! ")));

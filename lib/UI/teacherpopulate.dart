@@ -17,31 +17,18 @@ class Teachers extends StatefulWidget {
 }
 
 class _RoomsState extends State<Teachers> {
-  late Box<dynamic> s;
-  late Box<dynamic> m;
-  @override
-  void initState() {
-    super.initState();
-    load();
-  }
-
-  load() async {
-    s = await Hive.openBox("teachers");
-    m = await Hive.openBox("subjects");
-
-    return s;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         actions: [
           IconButton(
-              onPressed: () {
+              onPressed: () async {
+                Hive.deleteBoxFromDisk("teachers");
+                // Box<dynamic> s = await Hive.openBox("teachers");
                 ScaffoldMessenger.of(context).showSnackBar(
                     SnackBar(content: Text("Removing Data on teachers")));
-                s.clear();
+                // s.clear();
               },
               icon: Icon(Icons.clear))
         ],
@@ -85,7 +72,12 @@ class _RoomsState extends State<Teachers> {
   }
 
   show() {
-    return WidgetsBinding.instance.addPostFrameCallback((_) {
+    return WidgetsBinding.instance.addPostFrameCallback((_) async {
+      Box<dynamic> s = await Hive.openBox("teachers");
+      Box<dynamic> m = await Hive.openBox("subjects");
+
+      log("Hello ${s.values.toList()}");
+
       showDialog(
           context: context,
           builder: (_) {
@@ -142,7 +134,23 @@ class _RoomsState extends State<Teachers> {
                         const Text("Select Subject Teacher will teach"),
                         SingleChildScrollView(
                             child: ListBody(
-                                children: m.values.where((element) => s.values.any((m) => (m["subjects"] as List<Subject>).any((mi) => mi.subjectname == element["subjectname"])) )
+                                children: m.values
+                                    .where((element) {
+                                      log("1st ${m.values}");
+                                      log("2st ${element.toString()}");
+                                      if (s.values.isEmpty) {
+                                        return true;
+                                      }
+                                      return s.values.any((m) {
+                                        log("3rd ${m["subjects"]}");
+                                        return (m["subjects"] as List<dynamic>)
+                                            .any((mi) {
+                                          log(mi.subjectname!);
+                                          return !(mi.subjectname ==
+                                              element["subjectname"]);
+                                        });
+                                      });
+                                    })
                                     .map((e) => CheckboxListTile(
                                         value: _selectedItems.any((element) =>
                                             element.subjectname ==
@@ -185,31 +193,37 @@ class _RoomsState extends State<Teachers> {
                                     int.parse(teacherlevel.text),
                                     _selectedItems,
                                     teachername.text);
-                                // Map results = Room().toMap(
-                                //     int.parse(roomnumber.text),
-                                //     roomname.text,
-                                //     type == "classroom"
-                                //         ? RoomType(true)
-                                //         : RoomType(false));
-                                log(results.toString());
-                                final teachers = await Hive.openBox("teachers");
-                                if (teachers.values.any((element) =>
-                                    element["teachername"] ==
-                                    results["teachername"])) {
-                                  ScaffoldMessenger.of(context).showSnackBar(
-                                      const SnackBar(
-                                          content: const Text(
-                                              "Data is Present in the Database")));
-                                } else {
-                                teachers.add(results);
-                                }
-                                log(teachers.values.toString());
-                                Navigator.pop(context);
-                              } else {
-                                ScaffoldMessenger.of(context).showSnackBar(
-                                    const SnackBar(
-                                        content: const Text("Not Valid! ")));
+
+                                s.add(results);
+                                log("${s.values}Hello");
+                                // // Map results = Room().toMap(
+                                // //     int.parse(roomnumber.text),
+                                // //     roomname.text,
+                                // //     type == "classroom"
+                                // //         ? RoomType(true)
+                                // //         : RoomType(false));
+                                // log("Results$results");
+                                // final teachers = await Hive.openBox("teachers");
+                                // if (teachers.values.any((element) =>
+                                //     element["teachername"] ==
+                                //     results["teachername"])) {
+                                //   log("Results$results");
+
+                                //   // ScaffoldMessenger.of(context).showSnackBar(
+                                //   //     const SnackBar(
+                                //   //         content: const Text(
+                                //   //             "Data is Present in the Database")));
+                                // } else {
+                                // log(teachers.values.toString());
+
+                                // teachers.add(results).then((value) =>
+                                //     log(teachers.values.toString()));
                               }
+                              // Navigator.pop(context);
+                              // } else {
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                  const SnackBar(
+                                      content: const Text("Not Valid! ")));
                             })
                       ],
                     ))),

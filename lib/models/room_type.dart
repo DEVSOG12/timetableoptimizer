@@ -1,22 +1,12 @@
 import 'package:hive/hive.dart';
 
+part 'room_type.g.dart';
+
+@HiveType(typeId: 0)
 class RoomType {
+  @HiveField(0)
   bool? islab;
 
   RoomType(this.islab);
 }
 
-class RoomTypeAdapter extends TypeAdapter<RoomType> {
-  @override
-  final typeId = 0;
-
-  @override
-  RoomType read(BinaryReader reader) {
-    return RoomType(reader.read());
-  }
-
-  @override
-  void write(BinaryWriter writer, RoomType obj) {
-    writer.write(obj.islab);
-  }
-}
